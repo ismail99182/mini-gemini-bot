@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Gemini AI Chat</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 50px; background-color: #f4f4f9; }
+        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 100px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { background-color: #1a73e8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+        #output { margin-top: 20px; padding: 15px; background: #e8f0fe; border-left: 5px solid #1a73e8; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2> mini Gemini by shaheen developers (Secure Mode)</h2>
+    <textarea id="userInput" placeholder="Yahan apna sawaal likhein..."></textarea>
+    <br>
+    <button onclick="askGemini()">Jawab Hasil Karen</button>
+    <h3>Jawab:</h3>
+    <div id="output">Aapka jawab yahan dikhayi dega...</div>
+</div>
+
+<script>
+    async function askGemini() {
+        const prompt = document.getElementById("userInput").value;
+        const outputDiv = document.getElementById("output");
+
+        if (!prompt) { alert("Kuch likhein!"); return; }
+        outputDiv.innerText = "Soch raha hoon... 🤔";
+
+        try {
+            // Hum apne local node server ko hit kar rahe hain
+            const response = await fetch('http://localhost:3000/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                outputDiv.innerText = "Error: " + data.error;
+            } else {
+                outputDiv.innerText = data.text;
+            }
+        } catch (error) {
+            outputDiv.innerText = "Backend server se connect nahi ho saka. Pehle node server start karen.";
+        }
+    }
+</script>
+</body>
+</html>
