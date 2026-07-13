@@ -31,7 +31,7 @@ app.post('/api/chat', async (req, res) => {
     
     try {
         const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
+            model: 'gemini-3.5-flash',
             contents: prompt,
             config: {
                 // 🌟 FIX: System instruction ko update kiya taake language dynamically detect ho sake
