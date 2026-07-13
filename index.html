@@ -2,53 +2,235 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Gemini AI Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus UI - Mini Gemini</title>
+    <!-- Tailwind CSS CDN for Modern UI -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for Clean Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: Arial, sans-serif; margin: 50px; background-color: #f4f4f9; }
-        .container { max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1); }
-        textarea { width: 100%; height: 100px; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        button { background-color: #1a73e8; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-        #output { margin-top: 20px; padding: 15px; background: #e8f0fe; border-left: 5px solid #1a73e8; white-space: pre-wrap; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        /* Custom scrollbar for chat area */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 5px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #4b5563;
+            border-radius: 10px;
+        }
     </style>
 </head>
-<body>
+<body class="bg-[#0b0f19] text-gray-200 h-screen flex overflow-hidden">
 
-<div class="container">
-    <h2> mini Gemini by shaheen developers (Secure Mode)</h2>
-    <textarea id="userInput" placeholder="Yahan apna sawaal likhein..."></textarea>
-    <br>
-    <button onclick="askGemini()">Jawab Hasil Karen</button>
-    <h3>Jawab:</h3>
-    <div id="output">Aapka jawab yahan dikhayi dega...</div>
-</div>
+    <!-- SIDEBAR (Desktop par visible, Mobile par collapse ho sakta hai) -->
+    <aside class="hidden md:flex flex-col w-64 bg-[#111827] border-r border-gray-800 p-4 justify-between">
+        <div>
+            <!-- Logo Section -->
+            <div class="flex items-center gap-3 px-2 py-3 mb-6">
+                <div class="bg-indigo-600 text-white w-8 h-8 rounded-lg flex items-center justify-center font-bold text-lg shadow-lg shadow-indigo-500/30">N</div>
+                <div>
+                    <h1 class="font-bold text-sm leading-tight text-white">Nexus UI</h1>
+                    <span class="text-[10px] text-indigo-400 font-medium tracking-wider">SHAHEEN DEVELOPERS</span>
+                </div>
+            </div>
+            
+            <!-- New Chat Button -->
+            <button onclick="clearChat()" class="w-full bg-gray-800/50 hover:bg-gray-800 border border-gray-700/60 text-sm text-gray-300 rounded-xl py-2.5 px-4 flex items-center gap-2 transition-all duration-200 active:scale-[0.98]">
+                <i class="fa-solid fa-plus text-xs"></i> New Chat
+            </button>
+        </div>
+        
+        <!-- User Footer Info -->
+        <div class="border-t border-gray-800 pt-4 flex items-center gap-3 px-2">
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-xs text-white">
+                MI
+            </div>
+            <div class="truncate">
+                <p class="text-xs font-semibold text-white truncate">Muhammad Ismail</p>
+                <span class="text-[10px] text-emerald-400 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Secure Mode
+                </span>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT CONTAINER -->
+    <main class="flex-1 flex flex-col relative h-full bg-[#0f172a]">
+        
+        <!-- TOP BAR -->
+        <header class="h-16 border-b border-gray-800/60 bg-[#0b0f19]/80 backdrop-blur-md flex items-center justify-between px-4 md:px-8 z-10">
+            <div class="flex items-center gap-3">
+                <div class="md:hidden bg-indigo-600 text-white w-7 h-7 rounded-md flex items-center justify-center font-bold text-sm">N</div>
+                <h2 class="text-sm font-semibold text-white flex items-center gap-2">
+                    <i class="fa-solid fa-robot text-indigo-400 text-xs"></i> Mini Gemini AI
+                </h2>
+            </div>
+            <div class="flex items-center gap-2 text-xs bg-gray-800/40 border border-gray-700/50 px-3 py-1.5 rounded-full text-gray-400">
+                <i class="fa-solid fa-shield-halved text-emerald-400"></i> Local Server Active
+            </div>
+        </header>
+
+        <!-- CHAT FEED AREA -->
+        <div id="chatFeed" class="flex-1 overflow-y-auto p-4 md:p-8 space-y-6 custom-scrollbar pb-32">
+            <!-- Welcome State (Agar koi chat na ho) -->
+            <div id="welcomeState" class="max-w-2xl mx-auto text-center py-12 md:py-20 space-y-4">
+                <div class="w-16 h-16 bg-indigo-600/10 text-indigo-400 rounded-2xl flex items-center justify-center text-2xl mx-auto border border-indigo-500/20 shadow-xl shadow-indigo-500/5">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Main aapki kia madad kar sakta hoon?</h3>
+                <p class="text-xs text-gray-400 max-w-sm mx-auto">Shaheen Developers ka secure mini Gemini interface. Apna koi bhi sawal niche box me type karen.</p>
+            </div>
+        </div>
+
+        <!-- FLOATING INPUT CONTAINER -->
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/95 to-transparent pt-10 pb-6 px-4 md:px-8">
+            <div class="max-w-3xl mx-auto relative bg-[#1e293b] border border-gray-700/70 rounded-2xl shadow-2xl focus-within:border-indigo-500/80 transition-all duration-200">
+                
+                <!-- Textarea for Input -->
+                <textarea id="userInput" rows="1" oninput="autoGrow(this)" placeholder="Ask Nexus Gemini..." 
+                    class="w-full bg-transparent text-sm text-gray-100 placeholder-gray-400 pl-4 pr-14 py-4 focus:outline-none resize-none max-h-36 custom-scrollbar"
+                    onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); askGemini(); }"></textarea>
+                
+                <!-- Action Buttons right inside input -->
+                <div class="absolute right-3 bottom-3 flex items-center gap-2">
+                    <!-- Future Image Gen Icon Placeholder -->
+                    <button class="text-gray-400 hover:text-indigo-400 p-1.5 rounded-lg transition-colors" title="Image Feature Coming Soon">
+                        <i class="fa-regular fa-image text-base"></i>
+                    </button>
+                    
+                    <!-- Send Button -->
+                    <button onclick="askGemini()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-8 h-8 rounded-xl flex items-center justify-center transition-all active:scale-95 shadow-md shadow-indigo-600/20">
+                        <i class="fa-solid fa-paper-plane text-xs"></i>
+                    </button>
+                </div>
+            </div>
+            <p class="text-[10px] text-center text-gray-500 mt-2">Press Enter to send. Shift + Enter for new line.</p>
+        </div>
+
+    </main>
 
 <script>
-    async function askGemini() {
-        const prompt = document.getElementById("userInput").value;
-        const outputDiv = document.getElementById("output");
+    // Textarea auto-resize as user types
+    function autoGrow(element) {
+        element.style.height = "auto";
+        element.style.height = (element.scrollHeight) + "px";
+    }
 
-        if (!prompt) { alert("Kuch likhein!"); return; }
-        outputDiv.innerText = "Soch raha hoon... 🤔";
+    function clearChat() {
+        document.getElementById("chatFeed").innerHTML = '';
+        appendWelcomeState();
+    }
+
+    function appendWelcomeState() {
+        const chatFeed = document.getElementById("chatFeed");
+        chatFeed.innerHTML = `
+            <div id="welcomeState" class="max-w-2xl mx-auto text-center py-20 space-y-4">
+                <div class="w-16 h-16 bg-indigo-600/10 text-indigo-400 rounded-2xl flex items-center justify-center text-2xl mx-auto border border-indigo-500/20">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">Main aapki kia madad kar sakta hoon?</h3>
+                <p class="text-xs text-gray-400 max-w-sm mx-auto">Shaheen Developers ka secure mini Gemini interface.</p>
+            </div>
+        `;
+    }
+
+    // Function to append message blocks dynamically
+    function appendMessage(sender, text, isError = false) {
+        const chatFeed = document.getElementById("chatFeed");
+        const welcomeState = document.getElementById("welcomeState");
+        
+        if (welcomeState) welcomeState.remove();
+
+        const messageWrapper = document.createElement("div");
+        messageWrapper.className = `flex w-full ${sender === 'user' ? 'justify-end' : 'justify-start animate-fade-in'}`;
+
+        const isAi = sender === 'ai';
+        
+        messageWrapper.innerHTML = `
+            <div class="max-w-[85%] md:max-w-2xl flex gap-3 ${sender === 'user' ? 'flex-row-reverse' : ''}">
+                <!-- Avatar -->
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-[11px] flex-shrink-0 ${
+                    isAi ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-200'
+                }">
+                    ${isAi ? '<i class="fa-solid fa-robot"></i>' : 'U'}
+                </div>
+                <!-- Bubble -->
+                <div class="rounded-2xl px-4 py-2.5 text-sm leading-relaxed ${
+                    isAi 
+                        ? (isError ? 'bg-red-950/40 border border-red-900/50 text-red-200' : 'bg-gray-800/40 border border-gray-800 text-gray-200') 
+                        : 'bg-indigo-600 text-white'
+                }">
+                    <p class="white-space-pre-wrap">${text}</p>
+                </div>
+            </div>
+        `;
+
+        chatFeed.appendChild(messageWrapper);
+        chatFeed.scrollTop = chatFeed.scrollHeight; // Auto scroll to bottom
+    }
+
+    async function askGemini() {
+        const inputEl = document.getElementById("userInput");
+        const prompt = inputEl.value.trim();
+
+        if (!prompt) return;
+
+        // User ka message screen par add karen aur input clear karen
+        appendMessage('user', prompt);
+        inputEl.value = '';
+        inputEl.style.height = "auto"; // reset input height
+
+        // Typing indicator card generate karen
+        const chatFeed = document.getElementById("chatFeed");
+        const indicatorId = "loading-" + Date.now();
+        const loadingWrapper = document.createElement("div");
+        loadingWrapper.id = indicatorId;
+        loadingWrapper.className = "flex w-full justify-start";
+        loadingWrapper.innerHTML = `
+            <div class="max-w-2xl flex gap-3">
+                <div class="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center font-bold text-[11px]">
+                    <i class="fa-solid fa-robot"></i>
+                </div>
+                <div class="bg-gray-800/40 border border-gray-800 rounded-2xl px-4 py-3 text-sm text-gray-400 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></span>
+                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                </div>
+            </div>
+        `;
+        chatFeed.appendChild(loadingWrapper);
+        chatFeed.scrollTop = chatFeed.scrollHeight;
 
         try {
-           
-const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt: prompt })
-
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ prompt: prompt })
             });
 
             const data = await response.json();
+            
+            // Loading indicator remove karen
+            document.getElementById(indicatorId).remove();
+
             if (data.error) {
-                outputDiv.innerText = "Error: " + data.error;
+                appendMessage('ai', "Error: " + data.error, true);
             } else {
-                outputDiv.innerText = data.text;
+                appendMessage('ai', data.text);
             }
         } catch (error) {
-            outputDiv.innerText = "Backend server se connect nahi ho saka. Pehle node server start karen.";
+            document.getElementById(indicatorId).remove();
+            appendMessage('ai', "Backend server se connect nahi ho saka. Pehle node server start karen.", true);
         }
     }
 </script>
 </body>
-</html>
+    </html>
