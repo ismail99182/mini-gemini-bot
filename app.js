@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { OpenAI } = require('openai'); // 🌟 GoogleGenAI ki jagah OpenAI import kiya
+const { OpenAI } = require('openai');
 const cors = require('cors');
 const path = require('path');
 
@@ -10,13 +10,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files
+// Serve static files (index.html isi folder mein hai)
 app.use(express.static(path.join(__dirname)));
 
-// OpenAI Initialize karein (Yeh automatic process.env.OPENAI_API_KEY utha leta hai)
+// OpenAI Initialize (Yeh automatic process.env.OPENAI_API_KEY read karega)
 const openai = new OpenAI();
 
-// 1. Home Route for HTML
+// 1. Home Route (index.html serve karne ke liye)
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -30,9 +30,8 @@ app.post('/api/chat', async (req, res) => {
     }
     
     try {
-        // 🌟 OpenAI Chat Completion Request
         const response = await openai.chat.completions.create({
-            model: 'gpt-4o-mini', // OpenAI ka sab se fast aur cost-effective model
+            model: 'gpt-4o-mini', 
             messages: [
                 {
                     role: 'system',
@@ -45,15 +44,12 @@ app.post('/api/chat', async (req, res) => {
             ]
         });
         
-        // Response se text nikalne ka OpenAI ka tareeqa
         const replyText = response.choices[0].message.content;
-        
         res.json({ text: replyText });
 
     } catch (error) {
         console.error("OpenAI Backend Error:", error);
         
-        // OpenAI ke specific rate limit (insufficient balance ya quota) errors handle karne ke liye
         if (error.status === 429) {
             return res.status(429).json({ error: "OpenAI API limit exceeded or insufficient credits. Please check your billing dashboard." });
         }
