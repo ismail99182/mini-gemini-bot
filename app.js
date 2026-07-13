@@ -1,4 +1,4 @@
- require('dotenv').config();
+require('dotenv').config();
 
 const express = require('express');
 const { GoogleGenAI } = require('@google/genai');
@@ -44,4 +44,4 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // 🌟 VERCEL KE LIYE YEH LINE SAB SE END MEIN ZAROORI HAI
-module.exports = app;     
+module.exports = app;
