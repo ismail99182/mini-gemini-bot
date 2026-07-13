@@ -9,10 +9,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body class="bg-[#0b0f19] text-gray-200 h-[100dvh] flex overflow-hidden w-full fixed inset-0">
@@ -26,13 +35,16 @@
                     <span class="text-[10px] text-indigo-400 font-medium tracking-wider">SHAHEEN DEVELOPERS</span>
                 </div>
             </div>
+            
             <button onclick="clearChat()" class="w-full bg-gray-800/50 hover:bg-gray-800 border border-gray-700/60 text-sm text-gray-300 rounded-xl py-2.5 px-4 flex items-center gap-2 transition-all duration-200 active:scale-[0.98]">
                 <i class="fa-solid fa-plus text-xs"></i> New Chat
             </button>
         </div>
         
         <div class="border-t border-gray-800 pt-4 flex items-center gap-3 px-2">
-            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-xs text-white">MI</div>
+            <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center font-bold text-xs text-white">
+                MI
+            </div>
             <div class="truncate">
                 <p class="text-xs font-semibold text-white truncate">Muhammad Ismail</p>
                 <span class="text-[10px] text-emerald-400 flex items-center gap-1">
@@ -43,11 +55,12 @@
     </aside>
 
     <main class="flex-1 flex flex-col h-full bg-[#0f172a] overflow-hidden relative">
+        
         <header class="h-14 border-b border-gray-800/60 bg-[#0b0f19]/80 backdrop-blur-md flex items-center justify-between px-4 z-10 flex-shrink-0">
             <div class="flex items-center gap-3">
                 <div class="md:hidden bg-indigo-600 text-white w-7 h-7 rounded-md flex items-center justify-center font-bold text-sm">N</div>
                 <h2 class="text-xs md:text-sm font-semibold text-white flex items-center gap-2">
-                    <i class="fa-solid fa-robot text-indigo-400 text-xs"></i> Mini Gemini AI & Imagen 3
+                    <i class="fa-solid fa-robot text-indigo-400 text-xs"></i> Mini Gemini AI
                 </h2>
             </div>
             <div class="flex items-center gap-2 text-[10px] md:text-xs bg-gray-800/40 border border-gray-700/50 px-2.5 py-1 rounded-full text-gray-400">
@@ -61,26 +74,29 @@
                     <i class="fa-solid fa-wand-magic-sparkles"></i>
                 </div>
                 <h3 class="text-lg font-bold text-white">Main aapki kia madad kar sakta hoon?</h3>
-                <p class="text-xs text-gray-400 max-w-xs mx-auto">Kuch bhi puchen, ya boleiyen "Image banao a red car..."</p>
+                <p class="text-xs text-gray-400 max-w-xs mx-auto">Shaheen Developers ka secure mini Gemini interface.</p>
             </div>
         </div>
 
         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0f172a] via-[#0f172a]/95 to-transparent pt-6 pb-4 px-4">
             <div class="max-w-3xl mx-auto relative bg-[#1e293b] border border-gray-700/70 rounded-xl shadow-2xl focus-within:border-indigo-500/80 transition-all duration-200">
-                <textarea id="userInput" rows="1" oninput="autoGrow(this)" placeholder="Ask Nexus or type 'image banao'..." 
+                
+                <textarea id="userInput" rows="1" oninput="autoGrow(this)" placeholder="Ask Nexus Gemini..." 
                     class="w-full bg-transparent text-sm text-gray-100 placeholder-gray-400 pl-4 pr-24 py-3 focus:outline-none resize-none max-h-28 custom-scrollbar"
                     onkeydown="if(event.key === 'Enter' && !event.shiftKey) { event.preventDefault(); askGemini(); }"></textarea>
                 
                 <div class="absolute right-2.5 bottom-2 flex items-center gap-1.5">
-                    <button class="text-indigo-400 p-1 rounded-lg transition-colors" title="Imagen 3 Integration Active">
-                        <i class="fa-solid fa-wand-magic text-base"></i>
+                    <button class="text-gray-400 hover:text-indigo-400 p-1 rounded-lg transition-colors" title="Image Feature Coming Soon">
+                        <i class="fa-regular fa-image text-base"></i>
                     </button>
+                    
                     <button onclick="askGemini()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white w-7 h-7 rounded-lg flex items-center justify-center transition-all active:scale-95">
                         <i class="fa-solid fa-paper-plane text-[10px]"></i>
                     </button>
                 </div>
             </div>
         </div>
+
     </main>
 
 <script>
@@ -107,8 +123,7 @@
         `;
     }
 
-    // 🌟 UPDATED: Ab yeh images ko bhi handle kar sakta hai
-    function appendMessage(sender, text, isError = false, isImage = false) {
+    function appendMessage(sender, text, isError = false) {
         const chatFeed = document.getElementById("chatFeed");
         const welcomeState = document.getElementById("welcomeState");
         
@@ -118,11 +133,6 @@
         messageWrapper.className = `flex w-full ${sender === 'user' ? 'justify-end' : 'justify-start'}`;
 
         const isAi = sender === 'ai';
-        
-        // Agar response image hai, toh <img> tag dikhana hai, warna normal text <p>
-        const contentHtml = isImage 
-            ? `<img src="${text}" alt="Generated AI Image" class="rounded-lg max-w-full h-auto border border-gray-700 shadow-md mt-1 cursor-pointer hover:opacity-90 transition" onclick="window.open('${text}', '_blank')"/>`
-            : `<p style="white-space: pre-wrap;">${text}</p>`;
         
         messageWrapper.innerHTML = `
             <div class="max-w-[88%] md:max-w-2xl flex gap-2 ${sender === 'user' ? 'flex-row-reverse' : ''}">
@@ -136,7 +146,7 @@
                         ? (isError ? 'bg-red-950/40 border border-red-900/50 text-red-200' : 'bg-gray-800/40 border border-gray-800 text-gray-200') 
                         : 'bg-indigo-600 text-white'
                 }">
-                    ${contentHtml}
+                    <p style="white-space: pre-wrap;">${text}</p>
                 </div>
             </div>
         `;
@@ -145,7 +155,6 @@
         chatFeed.scrollTop = chatFeed.scrollHeight;
     }
 
-    // 🌟 UPDATED: Detect karega kab user image maang raha hai
     async function askGemini() {
         const inputEl = document.getElementById("userInput");
         const prompt = inputEl.value.trim();
@@ -176,14 +185,8 @@
         chatFeed.appendChild(loadingWrapper);
         chatFeed.scrollTop = chatFeed.scrollHeight;
 
-        // Simple check: Agar user ke message mein yeh words hain toh image endpoint hit hoga
-        const lowerPrompt = prompt.toLowerCase();
-        const isImageRequest = lowerPrompt.includes("image") || lowerPrompt.includes("photo") || lowerPrompt.includes("banao") || lowerPrompt.includes("generate");
-        
-        const targetUrl = isImageRequest ? '/api/generate-image' : '/api/chat';
-
         try {
-            const response = await fetch(targetUrl, {
+            const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ prompt: prompt })
@@ -194,9 +197,6 @@
 
             if (data.error) {
                 appendMessage('ai', "Error: " + data.error, true);
-            } else if (isImageRequest && data.image) {
-                // Agar image aayi hai toh use image format mein dikhao
-                appendMessage('ai', data.image, false, true);
             } else {
                 appendMessage('ai', data.text);
             }
