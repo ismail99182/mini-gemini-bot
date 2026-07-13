@@ -10,18 +10,20 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files
+// Serve static files (Yeh Vercel par HTML, CSS direct uthane mein madad karega)
 app.use(express.static(path.join(__dirname)));
 
 const API_KEY = process.env.GEMINI_API_KEY;
+
+// Naya SDK sahi tareeqe se init karne ke liye bina { apiKey } wrapper ke direct pass hota hai ya empty chora jata hai agar env mein GEMINI_API_KEY ho
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
-// 1. Home Route
+// 1. Home Route for HTML
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// 2. Text Chat Route (Gemini 2.5 Flash)
+// 2. API Chat Route
 app.post('/api/chat', async (req, res) => {
     const { prompt } = req.body;
     
@@ -38,7 +40,9 @@ app.post('/api/chat', async (req, res) => {
             }
         });
         
+        // 🌟 FIX: Naye SDK mein text nikalne ke liye .text() call karna parta hai
         const replyText = response.text ? response.text : (typeof response.text === 'function' ? response.text() : '');
+        
         res.json({ text: replyText });
     } catch (error) {
         console.error("Backend Error:", error);
@@ -46,35 +50,7 @@ app.post('/api/chat', async (req, res) => {
     }
 });
 
-// 🌟 3. NEW: Image Generation Route (Imagen 3)
-app.post('/api/generate-image', async (req, res) => {
-    const { prompt } = req.body;
-
-    if (!prompt) {
-        return res.status(400).json({ error: "Prompt is required" });
-    }
-
-    try {
-        const response = await ai.models.generateImages({
-            model: 'imagen-3.0-generate-002',
-            prompt: prompt,
-            config: {
-                numberOfImages: 1,
-                outputMimeType: 'image/jpeg',
-                aspectRatio: '1:1',
-            },
-        });
-
-        // Image data ko base64 se nikalna
-        const base64Image = response.generatedImages[0].image.imageBytes;
-        res.json({ image: `data:image/jpeg;base64,${base64Image}` });
-    } catch (error) {
-        console.error("Imagen Error:", error);
-        res.status(500).json({ error: error.message });
-    }
-});
-
-// Port configuration
+// Local development ke liye port setup
 const PORT = process.env.PORT || 3000;
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
