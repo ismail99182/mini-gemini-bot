@@ -56,7 +56,7 @@ app.post('/api/chat', async (req, res) => {
             const ai = new GoogleGenAI({ apiKey: activeKey });
 
             const response = await ai.models.generateContent({
-                model: 'gemini-1.5-flash', // Muft chalane ke liye sab se behtareen aur high limit wala model
+                model: 'gemini-3.5-flash', // Muft chalane ke liye sab se behtareen aur high limit wala model
                 contents: prompt,
                 config: {
                     systemInstruction: "You are a helpful AI assistant. Always detect the language of the user's prompt and reply in the EXACT same language and script. If the user writes in English, reply in English. If the user writes in Urdu script (اردو), reply in Urdu script. If the user writes in Roman Urdu (Urdu words using Latin/English alphabet), reply strictly in Roman Urdu. Maintain the same script and tone used by the user."
