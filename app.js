@@ -1,6 +1,6 @@
 require('dotenv').config();
 const express = require('express');
-const { OpenAI } = require('openai');
+const { GoogleGenAI } = require('@google/genai');
 const cors = require('cors');
 const path = require('path');
 
@@ -10,13 +10,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files (index.html isi folder mein hai)
+// Serve static files (Yeh Vercel par HTML, CSS direct uthane mein madad karega)
 app.use(express.static(path.join(__dirname)));
 
-// OpenAI Initialize (Yeh automatic process.env.OPENAI_API_KEY read karega)
-const openai = new OpenAI();
+const API_KEY = process.env.GEMINI_API_KEY;
 
-// 1. Home Route (index.html serve karne ke liye)
+// Naya SDK sahi tareeqe se init karne ke liye bina { apiKey } wrapper ke direct pass hota hai ya empty chora jata hai agar env mein GEMINI_API_KEY ho
+const ai = new GoogleGenAI({ apiKey: API_KEY });
+
+// 1. Home Route for HTML
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
@@ -30,30 +32,20 @@ app.post('/api/chat', async (req, res) => {
     }
     
     try {
-        const response = await openai.chat.completions.create({
-            model: 'gpt-4o-mini', 
-            messages: [
-                {
-                    role: 'system',
-                    content: "You are a helpful AI assistant. Always detect the language of the user's prompt and reply in the EXACT same language and script. If the user writes in English, reply in English. If the user writes in Urdu script (اردو), reply in Urdu script. If the user writes in Roman Urdu (Urdu words using Latin/English alphabet), reply strictly in Roman Urdu. Maintain the same script and tone used by the user."
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ]
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.5-flash',
+            contents: prompt,
+            config: {
+                systemInstruction: "You are a helpful AI assistant. You must ALWAYS reply in Roman Urdu (Urdu language written in Latin/English alphabet). Do not use Arabic/Urdu script, and do not reply in pure Hindi or English."
+            }
         });
         
-        const replyText = response.choices[0].message.content;
+        // 🌟 FIX: Naye SDK mein text nikalne ke liye .text() call karna parta hai
+        const replyText = response.text ? response.text : (typeof response.text === 'function' ? response.text() : '');
+        
         res.json({ text: replyText });
-
     } catch (error) {
-        console.error("OpenAI Backend Error:", error);
-        
-        if (error.status === 429) {
-            return res.status(429).json({ error: "OpenAI API limit exceeded or insufficient credits. Please check your billing dashboard." });
-        }
-        
+        console.error("Backend Error:", error);
         res.status(500).json({ error: error.message });
     }
 });
